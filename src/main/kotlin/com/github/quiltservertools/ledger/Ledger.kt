@@ -38,8 +38,13 @@ import java.nio.file.Files
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+<<<<<<< HEAD
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+=======
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 import com.github.quiltservertools.ledger.config.config as realConfig
 
 object Ledger : DedicatedServerModInitializer, CoroutineScope {
@@ -105,6 +110,7 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
 
     private fun serverStopped(server: MinecraftServer) {
         runBlocking {
+<<<<<<< HEAD
             try {
                 withTimeout(config[DatabaseSpec.queueTimeoutMin].minutes) {
                     Ledger.launch(Dispatchers.Default) {
@@ -118,6 +124,12 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
                     }
                     ActionQueueService.drainAll()
                     logInfo("Successfully drained database queue")
+=======
+            withTimeout(Duration.minutes(config[DatabaseSpec.queueTimeoutMin])) {
+                while (DatabaseManager.dbMutex.isLocked) {
+                    logInfo("Database queue is still draining. If you exit now actions WILL be lost")
+                    delay(Duration.seconds(config[DatabaseSpec.queueCheckDelaySec]))
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
                 }
             } catch (e: TimeoutCancellationException) {
                 logWarn("Database drain timed out. ${ActionQueueService.size} actions still in queue. Data may be lost.")

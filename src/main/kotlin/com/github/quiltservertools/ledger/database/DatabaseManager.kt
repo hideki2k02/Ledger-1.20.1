@@ -11,6 +11,7 @@ import com.github.quiltservertools.ledger.config.config
 import com.github.quiltservertools.ledger.logInfo
 import com.github.quiltservertools.ledger.logWarn
 import com.github.quiltservertools.ledger.registry.ActionRegistry
+import com.github.quiltservertools.ledger.utility.NbtUtils
 import com.github.quiltservertools.ledger.utility.Negatable
 import com.github.quiltservertools.ledger.utility.PlayerResult
 import com.mojang.authlib.GameProfile
@@ -20,6 +21,12 @@ import java.util.*
 import javax.sql.DataSource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
+<<<<<<< HEAD
+=======
+import kotlinx.coroutines.sync.withLock
+import net.minecraft.nbt.StringNbtReader
+import net.minecraft.server.MinecraftServer
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 import net.minecraft.util.Identifier
 import net.minecraft.util.WorldSavePath
 import net.minecraft.util.math.BlockPos
@@ -51,9 +58,16 @@ import org.jetbrains.exposed.sql.statements.StatementContext
 import org.jetbrains.exposed.sql.statements.expandArgs
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+<<<<<<< HEAD
 import org.jetbrains.exposed.sql.update
 import org.sqlite.SQLiteDataSource
 import kotlin.io.path.pathString
+=======
+import java.io.File
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.UUID
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 import kotlin.math.ceil
 
 object DatabaseManager {
@@ -163,6 +177,7 @@ object DatabaseManager {
             }
 
             val type = typeSupplier.get()
+<<<<<<< HEAD
             type.timestamp = action[Tables.Actions.timestamp]
             type.pos = BlockPos(action[Tables.Actions.x], action[Tables.Actions.y], action[Tables.Actions.z])
             type.world = Identifier.tryParse(action[Tables.Worlds.identifier])
@@ -178,6 +193,29 @@ object DatabaseManager {
             }
             type.extraData = action[Tables.Actions.extraData]
             type.rolledBack = action[Tables.Actions.rolledBack]
+=======
+            type.timestamp = action.timestamp
+            type.pos = BlockPos(action.x, action.y, action.z)
+            type.world = action.world.identifier
+            type.objectIdentifier = action.objectId.identifier
+            type.oldObjectIdentifier = action.oldObjectId.identifier
+            type.blockState = action.blockState?.let {
+                NbtUtils.blockStateFromProperties(
+                    StringNbtReader.parse(it),
+                    action.objectId.identifier
+                )
+            }
+            type.oldBlockState = action.oldBlockState?.let {
+                NbtUtils.blockStateFromProperties(
+                    StringNbtReader.parse(it),
+                    action.oldObjectId.identifier
+                )
+            }
+            type.sourceName = action.sourceName.name
+            type.sourceProfile = action.sourcePlayer?.let { GameProfile(it.playerId, it.playerName) }
+            type.extraData = action.extraData
+            type.rolledBack = action.rolledBack
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 
             actions.add(type)
         }
@@ -395,6 +433,7 @@ object DatabaseManager {
         }
     }
 
+<<<<<<< HEAD
     private fun Transaction.insertActions(actions: List<ActionType>) {
         Tables.Actions.batchInsert(actions, shouldReturnGeneratedValues = false) { action ->
             this[Tables.Actions.actionIdentifier] = getActionId(action.identifier)
@@ -410,6 +449,23 @@ object DatabaseManager {
             this[Tables.Actions.sourceName] = getOrCreateSourceId(action.sourceName)
             this[Tables.Actions.sourcePlayer] = action.sourceProfile?.let { getPlayerId(it.id) }
             this[Tables.Actions.extraData] = action.extraData
+=======
+    private fun Transaction.insertAction(action: ActionType) {
+        Tables.Action.new {
+            actionIdentifier = selectActionId(action.identifier)
+            timestamp = action.timestamp
+            x = action.pos.x
+            y = action.pos.y
+            z = action.pos.z
+            objectId = selectRegistryKey(action.objectIdentifier)
+            oldObjectId = selectRegistryKey(action.oldObjectIdentifier)
+            world = selectWorld(action.world ?: Ledger.server.overworld.registryKey.value)
+            blockState = action.blockState?.let { NbtUtils.blockStateToProperties(it)?.asString() }
+            oldBlockState = action.oldBlockState?.let { NbtUtils.blockStateToProperties(it)?.asString() }
+            sourceName = insertAndSelectSource(action.sourceName)
+            sourcePlayer = action.sourceProfile?.let { selectPlayer(it.id) }
+            extraData = action.extraData
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
         }
     }
 

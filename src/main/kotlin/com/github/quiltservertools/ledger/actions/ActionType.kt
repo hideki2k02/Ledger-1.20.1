@@ -3,6 +3,7 @@ package com.github.quiltservertools.ledger.actions
 import com.github.quiltservertools.ledger.config.ActionsSpec
 import com.github.quiltservertools.ledger.config.config
 import com.mojang.authlib.GameProfile
+import net.minecraft.block.BlockState
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
@@ -18,8 +19,8 @@ interface ActionType {
     var world: Identifier?
     var objectIdentifier: Identifier
     var oldObjectIdentifier: Identifier
-    var objectState: String?
-    var oldObjectState: String?
+    var blockState: BlockState?
+    var oldBlockState: BlockState?
     var sourceName: String
     var sourceProfile: GameProfile?
     var extraData: String?

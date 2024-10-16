@@ -6,14 +6,10 @@ import com.github.quiltservertools.ledger.actionutils.SearchResults
 import com.github.quiltservertools.ledger.database.DatabaseManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.minecraft.block.BedBlock
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.ChestBlock
-import net.minecraft.block.DoorBlock
-import net.minecraft.block.enums.BedPart
 import net.minecraft.block.enums.ChestType
-import net.minecraft.block.enums.DoubleBlockHalf
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
@@ -21,7 +17,7 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import java.util.*
+import java.util.UUID
 
 private val inspectingUsers = HashSet<UUID>()
 
@@ -64,14 +60,6 @@ fun ServerCommandSource.inspectBlock(pos: BlockPos) {
             getOtherChestSide(state, pos)?.let {
                 area = BlockBox.create(pos, it)
             }
-        } else if (state.block is DoorBlock) {
-            getOtherDoorHalf(state, pos).let {
-                area = BlockBox.create(pos, it)
-            }
-        } else if (state.block is BedBlock) {
-            getOtherBedPart(state, pos).let {
-                area = BlockBox.create(pos, it)
-            }
         }
 
         val params = ActionSearchParams.build {
@@ -112,25 +100,6 @@ private fun getOtherChestSide(state: BlockState, pos: BlockPos): BlockPos? {
             pos.offset(facing.rotateClockwise(Direction.Axis.Y))
         }
     } else null
-}
-
-private fun getOtherDoorHalf(state: BlockState, pos: BlockPos): BlockPos {
-    val half = state.get(DoorBlock.HALF)
-    return if (half == DoubleBlockHalf.LOWER) {
-        pos.offset(Direction.UP)
-    } else {
-        pos.offset(Direction.DOWN)
-    }
-}
-
-private fun getOtherBedPart(state: BlockState, pos: BlockPos): BlockPos {
-    val part = state.get(BedBlock.PART)
-    val direction = state.get(BedBlock.FACING)
-    return if (part == BedPart.FOOT) {
-        pos.offset(direction)
-    } else {
-        pos.offset(direction.opposite)
-    }
 }
 
 suspend fun PlayerEntity.getInspectResults(pos: BlockPos): SearchResults {
