@@ -40,9 +40,12 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 =======
+=======
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 =======
 >>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 import kotlin.time.Duration
@@ -115,6 +118,7 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
         runBlocking {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             try {
                 withTimeout(config[DatabaseSpec.queueTimeoutMin].minutes) {
                     Ledger.launch(Dispatchers.Default) {
@@ -131,11 +135,16 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
 =======
 =======
 >>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
+=======
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
             withTimeout(Duration.minutes(config[DatabaseSpec.queueTimeoutMin])) {
                 while (DatabaseManager.dbMutex.isLocked) {
                     logInfo("Database queue is still draining. If you exit now actions WILL be lost")
                     delay(Duration.seconds(config[DatabaseSpec.queueCheckDelaySec]))
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
+=======
 >>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 =======
 >>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
