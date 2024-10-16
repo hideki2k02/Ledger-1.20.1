@@ -39,9 +39,12 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 <<<<<<< HEAD
+<<<<<<< HEAD
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 =======
+=======
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 >>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
@@ -111,6 +114,7 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
     private fun serverStopped(server: MinecraftServer) {
         runBlocking {
 <<<<<<< HEAD
+<<<<<<< HEAD
             try {
                 withTimeout(config[DatabaseSpec.queueTimeoutMin].minutes) {
                     Ledger.launch(Dispatchers.Default) {
@@ -125,10 +129,15 @@ object Ledger : DedicatedServerModInitializer, CoroutineScope {
                     ActionQueueService.drainAll()
                     logInfo("Successfully drained database queue")
 =======
+=======
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
             withTimeout(Duration.minutes(config[DatabaseSpec.queueTimeoutMin])) {
                 while (DatabaseManager.dbMutex.isLocked) {
                     logInfo("Database queue is still draining. If you exit now actions WILL be lost")
                     delay(Duration.seconds(config[DatabaseSpec.queueCheckDelaySec]))
+<<<<<<< HEAD
+>>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
+=======
 >>>>>>> parent of 8b5522c (Expand logging capabilities (#197))
                 }
             } catch (e: TimeoutCancellationException) {
